@@ -6,7 +6,7 @@ const HELP_MESSAGE = "You can say give me task list, or you can say add item to 
 const HELP_REPROMPT = "What can I help you with?";
 const STOP_MESSAGE = 'Goodbye!';
 
-var toDoList = ["lemon", "potato"];
+var toDoList = [];
 
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
@@ -25,7 +25,9 @@ const handlers = {
     },
     // See how many items are on the task list
     'howMany' : function() {
-        if (toDoList.length == 1) {
+        if (toDoList.length == 0) {
+            var speechOutput = 'You have no items.';
+        } else if (toDoList.length == 1) {
             var speechOutput = 'You have 1 item.';
         } else {
             var speechOutput = 'You have ' + (toDoList.length).toString() + ' items.';
@@ -47,7 +49,9 @@ const handlers = {
         for (var i = 0;i < toDoList.length; i++) {
             var itemWords = toDoList[i].split(" ");
             var intersect = itemWords.filter(function(n){return inputWords.indexOf(n) !== -1;});
-            intersection.push([i, intersect.length]);
+            if (intersect.length > 0){
+                intersection.push([i, intersect.length]);
+            }
         }
         
         // If no items with those words exist.
@@ -85,7 +89,11 @@ const handlers = {
                 this.emit(':tellWithCard', speechOutput, 'Feedback', speechOutput);
             }
         }
-        var speechOutput = 'Here are ' + num.toString() + ' items: ';
+        if (num == 1) {
+            var speechOutput = 'Here is 1 item: ';
+        } else {
+            var speechOutput = 'Here are ' + num.toString() + ' items: ';
+        }
         for (var i = 0; i < num; i++) {
             speechOutput += (i+1).toString() +'. ' + toDoList[i] + '. ';
         }
